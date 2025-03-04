@@ -1,0 +1,36 @@
+name: Run Benchllama Benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: 'Model to benchmark'
+        required: true
+        default: 'deepseek-r1:8b'
+      samples:
+        description: 'Number of samples'
+        required: true
+        default: '2'
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      
+      - name: Install Benchllama
+        run: pip install benchllama
+      
+      - name: Run Benchllama Benchmark
+        run: |
+          benchllama evaluate \
+            --models "${{ inputs.model }}" \
+            --eval \
+            --samples "${{ inputs.samples }}" \
+            --provider-url "${{ secrets.PROVIDER_URL }}"
