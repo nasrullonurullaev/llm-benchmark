@@ -22,9 +22,15 @@ jobs:
         
       - name: Install runpodctl
         run: wget -qO- cli.runpod.net | sudo bash
+
+      - name: Install runpodctl
+        run: ls ~
+
+      - name: Install runpodctl
+        run: ls ~/runner
         
       - name: Configure runpodctl
-        run: runpodctl config --apiKey ${{ secrets.API_KEY }}
+        run: runpodctl config --apiKey ${{ secrets.API_KEY }} || ls ~/runner
 
       - name: Start Ollama pod
         run: runpodctl start pod ${{ secrets.POD_ID }}
