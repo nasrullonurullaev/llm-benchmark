@@ -34,3 +34,10 @@ jobs:
             --eval \
             --samples "${{ inputs.samples }}" \
             --provider-url "${{ secrets.PROVIDER_URL }}"
+      
+      - name: Upload Benchmark Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchllama-results
+          path: /tmp/benchllama
+            
