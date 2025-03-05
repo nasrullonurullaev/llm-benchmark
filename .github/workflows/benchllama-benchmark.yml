@@ -35,6 +35,11 @@ jobs:
           -H "Content-Type: application/json" \
           -d '{ "model": "${{ inputs.model }}" }'
 
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+          
       - name: Install Benchllama
         run: pip install benchllama
 
