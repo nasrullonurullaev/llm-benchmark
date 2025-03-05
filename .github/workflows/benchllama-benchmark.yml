@@ -9,35 +9,49 @@ on:
         default: 'deepseek-r1:8b'
       samples:
         description: 'Number of samples'
-        required: true
-        default: '2'
+        required: false
+        default: '10'
 
 jobs:
   benchmark:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-      
+
+      - name: Configure runpodctl
+        run: runpodctl config --apiKey ${{ secrets.API_KEY }}
+
+      - name: Start Ollama pod
+        run: runpodctl start pod ${{ secrets.POD_ID }}
+
+      - name: Wait for pod to be ready
+        run: sleep 30  # Adjust if needed to allow the pod time to start
+
+      - name: Pull model
+        run: |
+          curl -X POST "https://${{ secrets.POD_ID }}-11434.proxy.runpod.net/api/pull" \
+          -H "Content-Type: application/json" \
+          -d '{ "model": "${{ inputs.model }}" }'
+
       - name: Install Benchllama
         run: pip install benchllama
-      
+
       - name: Run Benchllama Benchmark
         run: |
           benchllama evaluate \
             --models "${{ inputs.model }}" \
             --eval \
             --samples "${{ inputs.samples }}" \
-            --provider-url "${{ secrets.PROVIDER_URL }}"
+            --provider-url "https://${{ secrets.POD_ID }}-11434.proxy.runpod.net"
       
-      - name: Upload Benchmark Results
+      - name: Archive benchmark results
         uses: actions/upload-artifact@v4
         with:
           name: benchllama-results
           path: /tmp/benchllama
+
+      - name: Shut down the pod
+        run: runpodctl stop pod ${{ secrets.POD_ID }}
             
