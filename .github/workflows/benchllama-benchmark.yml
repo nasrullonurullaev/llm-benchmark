@@ -27,10 +27,10 @@ jobs:
         run: ls ~
 
       - name: Install runpodctl
-        run: ls ~/runner
+        run: ls ~/runners
         
       - name: Configure runpodctl
-        run: runpodctl config --apiKey ${{ secrets.API_KEY }} || ls ~/runner
+        run: runpodctl config --apiKey ${{ secrets.API_KEY }} || ls ~/runners
 
       - name: Start Ollama pod
         run: runpodctl start pod ${{ secrets.POD_ID }}
