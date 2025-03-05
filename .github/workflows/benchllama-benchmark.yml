@@ -19,7 +19,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
+        
+      - name: Install runpodctl
+        run: wget -qO- cli.runpod.net | sudo bash
+        
       - name: Configure runpodctl
         run: runpodctl config --apiKey ${{ secrets.API_KEY }}
 
