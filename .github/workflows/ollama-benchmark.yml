@@ -16,7 +16,7 @@ env:
   GPU_TYPE: "NVIDIA RTX 2000 Ada Generation"
   IMAGE_NAME: "ollama/ollama"
 
-ejobs:
+jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
@@ -24,29 +24,27 @@ ejobs:
         uses: actions/checkout@v4
 
       - name: Install runpodctl
-        run: wget -qO- cli.runpod.net | sudo bash
-      
+        run: wget -qO- cli.runpod.net | bash
+
       - name: Configure runpodctl
-        run: runpodctl config --apiKey ${{ secrets.API_KEY }} || ls ~/runners
+        run: runpodctl config --apiKey ${{ secrets.API_KEY }}
 
       - name: Create RunPod pod
         run: |
           CREATE_OUTPUT=$(runpodctl create pod --ports '11434/tcp' --secureCloud --gpuType "$GPU_TYPE" --imageName "$IMAGE_NAME")
           echo "$CREATE_OUTPUT"
-          POD_ID=$(echo "$CREATE_OUTPUT" | grep -oP '(?<=pod ")[^"]+')
-          echo "Extracted POD_ID: $POD_ID"
+          POD_ID=$(echo "$CREATE_OUTPUT" | awk -F'"' '/pod "/ {print $2}')
           echo "POD_ID=$POD_ID" >> $GITHUB_ENV
 
       - name: Get RunPod pod details
         run: |
           POD_DETAILS=$(runpodctl get pod $POD_ID -a)
           echo "$POD_DETAILS"
-          ENDPOINT=$(echo "$POD_DETAILS" | grep -oP '\d+\.\d+\.\d+\.\d+:\d+(?=->11434)')
-          echo "Extracted ENDPOINT: $ENDPOINT"
+          ENDPOINT=$(echo "$POD_DETAILS" | awk -F'[: ]+' '/->11434/ {print $1 ":" $2}')
           echo "ENDPOINT=$ENDPOINT" >> $GITHUB_ENV
 
       - name: Wait for pod to be ready
-        run: sleep 30  # Adjust if needed to allow the pod time to start
+        run: sleep 30
 
       - name: Pull model
         run: |
@@ -64,6 +62,7 @@ ejobs:
 
       - name: Run Benchllama Benchmark
         run: |
+          mkdir -p /tmp/benchllama
           benchllama evaluate \
             --models "${{ inputs.model }}" \
             --eval \
