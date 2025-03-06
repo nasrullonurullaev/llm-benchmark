@@ -11,6 +11,10 @@ on:
         description: 'Number of samples'
         required: false
         default: '10'
+      language:
+        description: 'Benchmark language (python or js)'
+        required: true
+        default: 'python'        
 
 env:
   GPU_TYPE: "NVIDIA RTX 2000 Ada Generation"
@@ -64,7 +68,9 @@ jobs:
             --models "${{ inputs.model }}" \
             --eval \
             --samples "${{ inputs.samples }}" \
-            --provider-url "http://$ENDPOINT"
+            --languages "${{ inputs.language }}" \
+            --dataset "data/${{ inputs.language }}/humanevalpack.jsonl" \
+            --provider-url "http://$ENDPOINT""
 
       - name: Archive benchmark results
         uses: actions/upload-artifact@v4
