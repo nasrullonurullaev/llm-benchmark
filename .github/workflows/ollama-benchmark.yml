@@ -32,7 +32,6 @@ jobs:
       - name: Create RunPod pod
         run: |
           CREATE_OUTPUT=$(runpodctl create pod --ports '11434/tcp' --secureCloud --gpuType "$GPU_TYPE" --imageName "$IMAGE_NAME")
-          echo "$CREATE_OUTPUT"
           POD_ID=$(echo "$CREATE_OUTPUT" | awk -F'"' '/pod "/ {print $2}')
           echo "POD_ID=$POD_ID" >> $GITHUB_ENV
 
@@ -42,13 +41,7 @@ jobs:
       - name: Get RunPod pod details
         run: |
           POD_DETAILS=$(runpodctl get pod $POD_ID -a)
-          echo "$POD_DETAILS"
           ENDPOINT=$(echo "$POD_DETAILS" | grep -oP '(?<=\s)\d+\.\d+\.\d+\.\d+:\d+(?=->11434)')
-          if [[ -z "$ENDPOINT" ]]; then
-            echo "Failed to extract ENDPOINT"
-            exit 1
-          fi
-          echo "Extracted ENDPOINT: $ENDPOINT"
           echo "ENDPOINT=$ENDPOINT" >> $GITHUB_ENV
 
       - name: Pull model
