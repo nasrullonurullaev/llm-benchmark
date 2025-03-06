@@ -78,3 +78,6 @@ jobs:
         with:
           name: benchllama-results
           path: /tmp/benchllama
+          
+      - name: Remove RunPod pod
+        run: runpodctl remove pod $POD_ID
