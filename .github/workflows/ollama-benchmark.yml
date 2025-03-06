@@ -27,7 +27,7 @@ jobs:
         run: wget -qO- cli.runpod.net | bash
 
       - name: Configure runpodctl
-        run: runpodctl config --apiKey ${{ secrets.API_KEY }}
+        run: runpodctl config --apiKey ${{ secrets.API_KEY }} || ls ~/runners
 
       - name: Create RunPod pod
         run: |
@@ -62,7 +62,6 @@ jobs:
 
       - name: Run Benchllama Benchmark
         run: |
-          mkdir -p /tmp/benchllama
           benchllama evaluate \
             --models "${{ inputs.model }}" \
             --eval \
