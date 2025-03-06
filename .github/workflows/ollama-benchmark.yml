@@ -43,7 +43,12 @@ jobs:
         run: |
           POD_DETAILS=$(runpodctl get pod $POD_ID -a)
           echo "$POD_DETAILS"
-          ENDPOINT=$(echo "$POD_DETAILS" | awk -F'[: ]+' '/->11434/ {print $1 ":" $2}')
+          ENDPOINT=$(echo "$POD_DETAILS" | grep -oP '(?<=\s)\d+\.\d+\.\d+\.\d+:\d+(?=->11434)')
+          if [[ -z "$ENDPOINT" ]]; then
+            echo "Failed to extract ENDPOINT"
+            exit 1
+          fi
+          echo "Extracted ENDPOINT: $ENDPOINT"
           echo "ENDPOINT=$ENDPOINT" >> $GITHUB_ENV
 
       - name: Pull model
