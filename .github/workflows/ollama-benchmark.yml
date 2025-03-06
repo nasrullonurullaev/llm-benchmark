@@ -53,7 +53,7 @@ jobs:
 
       - name: Pull model
         run: |
-          curl -X POST "https://$ENDPOINT/api/pull" \
+          curl -X POST "http://$ENDPOINT/api/pull" \
           -H "Content-Type: application/json" \
           -d '{ "model": "${{ inputs.model }}" }'
 
@@ -71,7 +71,7 @@ jobs:
             --models "${{ inputs.model }}" \
             --eval \
             --samples "${{ inputs.samples }}" \
-            --provider-url "https://$ENDPOINT"
+            --provider-url "http://$ENDPOINT"
 
       - name: Archive benchmark results
         uses: actions/upload-artifact@v4
