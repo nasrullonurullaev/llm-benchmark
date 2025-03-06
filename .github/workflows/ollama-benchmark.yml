@@ -37,7 +37,7 @@ jobs:
           echo "POD_ID=$POD_ID" >> $GITHUB_ENV
 
       - name: Wait for pod to be ready
-        run: sleep 30         
+        run: sleep 40         
 
       - name: Get RunPod pod details
         run: |
