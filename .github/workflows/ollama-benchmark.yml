@@ -44,8 +44,7 @@ jobs:
 
       - name: Get RunPod pod details
         run: |
-          POD_DETAILS=$(runpodctl get pod $POD_ID -a)
-          ENDPOINT=$(echo "$POD_DETAILS" | grep -oP '(?<=\s)\d+\.\d+\.\d+\.\d+:\d+(?=->11434)')
+          ENDPOINT=$(echo "$(runpodctl get pod $POD_ID -a)" | grep -oP '(?<=\s)\d+\.\d+\.\d+\.\d+:\d+(?=->11434)')
           echo "ENDPOINT=$ENDPOINT" >> $GITHUB_ENV
 
       - name: Pull model
