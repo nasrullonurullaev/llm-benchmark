@@ -70,7 +70,7 @@ jobs:
             --samples "${{ inputs.samples }}" \
             --languages "${{ inputs.language }}" \
             --dataset "data/${{ inputs.language }}/humanevalpack.jsonl" \
-            --provider-url "http://$ENDPOINT"
+            --provider-url "http://$ENDPOINT""
 
       - name: Archive benchmark results
         uses: actions/upload-artifact@v4
@@ -79,4 +79,5 @@ jobs:
           path: /tmp/benchllama
           
       - name: Remove RunPod pod
+        if: always()
         run: runpodctl remove pod $POD_ID
