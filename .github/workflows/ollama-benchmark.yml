@@ -27,7 +27,7 @@ jobs:
         run: wget -qO- cli.runpod.net | sudo bash
 
       - name: Configure runpodctl
-        run: sudo runpodctl config --apiKey ${{ secrets.API_KEY }} || ls ~/runners
+        run: runpodctl config --apiKey ${{ secrets.API_KEY }} || ls ~/runners
 
       - name: Create RunPod pod
         run: |
