@@ -36,15 +36,15 @@ jobs:
           POD_ID=$(echo "$CREATE_OUTPUT" | awk -F'"' '/pod "/ {print $2}')
           echo "POD_ID=$POD_ID" >> $GITHUB_ENV
 
+      - name: Wait for pod to be ready
+        run: sleep 30         
+
       - name: Get RunPod pod details
         run: |
           POD_DETAILS=$(runpodctl get pod $POD_ID -a)
           echo "$POD_DETAILS"
           ENDPOINT=$(echo "$POD_DETAILS" | awk -F'[: ]+' '/->11434/ {print $1 ":" $2}')
           echo "ENDPOINT=$ENDPOINT" >> $GITHUB_ENV
-
-      - name: Wait for pod to be ready
-        run: sleep 30
 
       - name: Pull model
         run: |
