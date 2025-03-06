@@ -1,0 +1,77 @@
+name: Run Benchllama Benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: 'Model to benchmark'
+        required: true
+        default: 'deepseek-r1:8b'
+      samples:
+        description: 'Number of samples'
+        required: false
+        default: '10'
+
+env:
+  GPU_TYPE: "NVIDIA RTX 2000 Ada Generation"
+  IMAGE_NAME: "ollama/ollama"
+
+ejobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install runpodctl
+        run: wget -qO- cli.runpod.net | sudo bash
+      
+      - name: Configure runpodctl
+        run: runpodctl config --apiKey ${{ secrets.API_KEY }} || ls ~/runners
+
+      - name: Create RunPod pod
+        run: |
+          CREATE_OUTPUT=$(runpodctl create pod --ports '11434/tcp' --secureCloud --gpuType "$GPU_TYPE" --imageName "$IMAGE_NAME")
+          echo "$CREATE_OUTPUT"
+          POD_ID=$(echo "$CREATE_OUTPUT" | grep -oP '(?<=pod ")[^"]+')
+          echo "Extracted POD_ID: $POD_ID"
+          echo "POD_ID=$POD_ID" >> $GITHUB_ENV
+
+      - name: Get RunPod pod details
+        run: |
+          POD_DETAILS=$(runpodctl get pod $POD_ID -a)
+          echo "$POD_DETAILS"
+          ENDPOINT=$(echo "$POD_DETAILS" | grep -oP '\d+\.\d+\.\d+\.\d+:\d+(?=->11434)')
+          echo "Extracted ENDPOINT: $ENDPOINT"
+          echo "ENDPOINT=$ENDPOINT" >> $GITHUB_ENV
+
+      - name: Wait for pod to be ready
+        run: sleep 30  # Adjust if needed to allow the pod time to start
+
+      - name: Pull model
+        run: |
+          curl -X POST "https://$ENDPOINT/api/pull" \
+          -H "Content-Type: application/json" \
+          -d '{ "model": "${{ inputs.model }}" }'
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install Benchllama
+        run: pip install benchllama
+
+      - name: Run Benchllama Benchmark
+        run: |
+          benchllama evaluate \
+            --models "${{ inputs.model }}" \
+            --eval \
+            --samples "${{ inputs.samples }}" \
+            --provider-url "https://$ENDPOINT"
+
+      - name: Archive benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchllama-results
+          path: /tmp/benchllama
