@@ -28,4 +28,12 @@ jobs:
         run: |
           CREATE_OUTPUT=$(runpodctl create pod --ports '8000/tcp' --secureCloud --gpuType "$GPU_TYPE" --imageName "$IMAGE_NAME" --args "--model ${{ inputs.model }} --max-model-len 8192 --port 8000")
           POD_ID=$(echo "$CREATE_OUTPUT" | awk -F'"' '/pod "/ {print $2}')
-          echo "POD_ID=$POD_ID" >> $GITHUB_ENV        
+          echo "POD_ID=$POD_ID" >> $GITHUB_ENV
+
+      - name: Wait for pod to be ready
+        run: sleep 60         
+
+      - name: Get RunPod pod details
+        run: |
+          ENDPOINT=$(echo "$(runpodctl get pod $POD_ID -a)" | grep -oP '(?<=\s)\d+\.\d+\.\d+\.\d+:\d+(?=->8000)')
+          echo "ENDPOINT=$ENDPOINT" >> $GITHUB_ENV          
