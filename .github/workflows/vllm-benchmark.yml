@@ -1,0 +1,31 @@
+name: Vllm benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: 'Model to benchmark'
+        required: true
+        default: "neuralmagic/Meta-Llama-3.1-8B-Instruct-FP8"  
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      GPU_TYPE: "NVIDIA RTX 2000 Ada Generation"
+      IMAGE_NAME: "vllm/vllm-openai:latest"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install runpodctl
+        run: wget -qO- cli.runpod.net | sudo bash
+
+      - name: Configure runpodctl
+        run: runpodctl config --apiKey ${{ secrets.API_KEY }} || ls ~/runners
+        
+      - name: Create RunPod pod
+        run: |
+          CREATE_OUTPUT=$(runpodctl create pod --secureCloud --gpuType "$GPU_TYPE" --imageName "$IMAGE_NAME" --args "--model ${{ inputs.model }} --port 8000")
+          POD_ID=$(echo "$CREATE_OUTPUT" | awk -F'"' '/pod "/ {print $2}')
+          echo "POD_ID=$POD_ID" >> $GITHUB_ENV        
