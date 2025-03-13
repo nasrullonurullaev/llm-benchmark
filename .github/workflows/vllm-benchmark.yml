@@ -50,7 +50,7 @@ jobs:
           VLLM_USE_PRECOMPILED=1 pip install --editable .
 
       - name: Install dependency
-        run: pip install pandas          
+        run: pip install pandas datasets          
 
       - name: Run benchmark
         run: |
