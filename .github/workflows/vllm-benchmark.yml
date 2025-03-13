@@ -41,7 +41,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: '3.12'
    
       - name: Clone vLLM repository
         run: |
@@ -56,4 +56,8 @@ jobs:
               --base-url "$ENDPOINT" \
               --dataset-name=random \
               --model "${{ inputs.MODEL_NAME }}" \
-              --seed 12345          
+              --seed 12345
+
+      - name: Remove RunPod pod
+        if: always()
+        run: runpodctl remove pod $POD_ID              
