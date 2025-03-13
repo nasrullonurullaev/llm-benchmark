@@ -43,12 +43,6 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install Vllm
-        run: pip install --upgrade setuptools wheel         
-
-      - name: Install Vllm
-        run: pip install vllm
-
       - name: Clone vLLM repository
         run: git clone https://github.com/vllm-project/vllm
 
