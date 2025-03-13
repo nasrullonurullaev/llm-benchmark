@@ -56,7 +56,7 @@ jobs:
         run: |
           cd vllm/benchmarks
           python3 benchmark_serving.py --backend openai \
-              --base-url "$ENDPOINT" \
+              --base-url "http://$ENDPOINT" \
               --dataset-name=random \
               --model "${{ inputs.MODEL_NAME }}" \
               --seed 12345
