@@ -44,7 +44,7 @@ jobs:
           python-version: '3.x'
 
       - name: Install Vllm
-        run: pip install Vllm
+        run: pip install vllm
 
       - name: Clone vLLM repository
         run: git clone https://github.com/vllm-project/vllm
