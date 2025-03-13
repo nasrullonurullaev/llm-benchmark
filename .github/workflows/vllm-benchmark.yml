@@ -48,7 +48,7 @@ jobs:
 
       - name: Run benchmark
         run: |
-          cd vllm/benchmark
+          cd vllm/benchmarks
           python3 benchmark_serving.py --backend openai \
               --base-url "$ENDPOINT" \
               --dataset-name=random \
