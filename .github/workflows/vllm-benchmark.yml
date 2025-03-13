@@ -36,4 +36,24 @@ jobs:
       - name: Get RunPod pod details
         run: |
           ENDPOINT=$(echo "$(runpodctl get pod $POD_ID -a)" | grep -oP '(?<=\s)\d+\.\d+\.\d+\.\d+:\d+(?=->8000)')
-          echo "ENDPOINT=$ENDPOINT" >> $GITHUB_ENV          
+          echo "ENDPOINT=$ENDPOINT" >> $GITHUB_ENV
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install Vllm
+        run: pip install Vllm
+
+      - name: Clone vLLM repository
+        run: git clone https://github.com/vllm-project/vllm
+
+      - name: Run benchmark
+        run: |
+          cd vllm/benchmark
+          python3 benchmark_serving.py --backend openai \
+              --base-url "$ENDPOINT" \
+              --dataset-name=random \
+              --model "${{ inputs.MODEL_NAME }}" \
+              --seed 12345          
