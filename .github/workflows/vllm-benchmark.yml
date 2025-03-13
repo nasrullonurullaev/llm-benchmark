@@ -46,8 +46,8 @@ jobs:
       - name: Clone vLLM repository
         run: |
           git clone https://github.com/vllm-project/vllm
-         cd vllm
-         VLLM_USE_PRECOMPILED=1 pip install --editable .
+          cd vllm
+          VLLM_USE_PRECOMPILED=1 pip install --editable .
 
       - name: Run benchmark
         run: |
