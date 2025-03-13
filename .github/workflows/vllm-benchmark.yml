@@ -49,6 +49,9 @@ jobs:
           cd vllm
           VLLM_USE_PRECOMPILED=1 pip install --editable .
 
+      - name: Install dependency
+        run: pip install pandas          
+
       - name: Run benchmark
         run: |
           cd vllm/benchmarks
