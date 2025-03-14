@@ -61,9 +61,17 @@ jobs:
           python3 benchmark_serving.py --backend openai \
               --base-url "http://$ENDPOINT" \
               --dataset-name=random \
+              --result-filename "output.json" \
               --model "${{ inputs.model }}" \
               --seed 12345
-
+              
+      - name: Archive benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: vllm-results
+          path: output.json
+          
       - name: Remove RunPod pod
 #        if: always()
-        run: runpodctl remove pod $POD_ID              
+        run: runpodctl remove pod $POD_ID
+              
