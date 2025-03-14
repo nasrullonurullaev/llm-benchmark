@@ -64,7 +64,10 @@ jobs:
               --result-filename "output.json" \
               --model "${{ inputs.model }}" \
               --seed 12345
-              
+
+      - name: Install dependency
+        run: ls -l
+        
       - name: Archive benchmark results
         uses: actions/upload-artifact@v4
         with:
