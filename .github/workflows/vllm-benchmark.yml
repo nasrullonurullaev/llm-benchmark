@@ -50,8 +50,11 @@ jobs:
           VLLM_USE_PRECOMPILED=1 pip install --editable .
 
       - name: Install dependency
-        run: pip install -U pandas datasets pynvml         
-
+        run: pip install pandas datasets       
+      
+      - name: Install dependency
+        run: pip install -U pynvml
+        
       - name: Run benchmark
         run: |
           cd vllm/benchmarks
@@ -62,5 +65,5 @@ jobs:
               --seed 12345
 
       - name: Remove RunPod pod
-        if: always()
+#        if: always()
         run: runpodctl remove pod $POD_ID              
