@@ -6,7 +6,7 @@ on:
       model:
         description: 'Model to benchmark'
         required: true
-        default: "neuralmagic/Meta-Llama-3.1-8B-Instruct-FP8"  
+        default: "deepseek-ai/DeepSeek-R1-Distill-Llama-8B"  
 
 jobs:
   deploy:
