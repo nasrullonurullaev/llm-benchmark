@@ -26,7 +26,7 @@ jobs:
         
       - name: Create RunPod pod
         run: |
-          CREATE_OUTPUT=$(runpodctl create pod --ports '8000/tcp' --secureCloud --gpuType "$GPU_TYPE" --imageName "$IMAGE_NAME" --args "--model ${{ inputs.model }} --max-model-len 8192 --port 8000 --enforce-eager --gpu-memory-utilization 0.95")
+          CREATE_OUTPUT=$(runpodctl create pod --ports '8000/tcp' --secureCloud --gpuType "$GPU_TYPE" --imageName "$IMAGE_NAME" --args "--model ${{ inputs.model }} --max-model-len 8192 --port 8000 --enforce-eager --gpu-memory-utilization 0.95 --max-model-len 8192")
           POD_ID=$(echo "$CREATE_OUTPUT" | awk -F'"' '/pod "/ {print $2}')
           echo "POD_ID=$POD_ID" >> $GITHUB_ENV
 
