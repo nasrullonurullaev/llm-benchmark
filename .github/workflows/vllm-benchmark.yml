@@ -67,7 +67,3 @@ jobs:
               --result-filename "output.json" \
               --model "${{ inputs.model }}" \
               --seed 12345
-
-      - name: Remove RunPod Instance
-        if: always()
-#        run: runpodctl remove pod $POD_ID
