@@ -67,14 +67,15 @@ jobs:
               --model "${{ inputs.model }}" \
               --result-filename "benchmark_result.json" \
               --save-result \
-              --seed 12345
+              --seed 12345 | tee benchmark_output.log
 
       - name: Output Benchmark Summary
         run: |
           echo "### Serving Benchmark Result" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          grep -A 20 "============ Serving Benchmark Result =============" vllm/benchmarks/benchmark_result.json >> $GITHUB_STEP_SUMMARY
+          grep -A 20 "============ Serving Benchmark Result" vllm/benchmarks/benchmark_output.log >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
               
 
       - name: Install Dependencies
