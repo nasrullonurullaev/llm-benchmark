@@ -76,20 +76,11 @@ jobs:
           grep -A 20 "============ Serving Benchmark Result" vllm/benchmarks/benchmark_output.log >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
 
-              
-
-      - name: Install Dependencies
-        run: ls
-
-      - name: Install Dependencies
-        run: ls vllm/benchmarks
-
       - name: Archive Benchmark Results
         uses: actions/upload-artifact@v4
         with:
           name: benchmark-results
           path: vllm/benchmarks/benchmark_result.json        
-
 
       - name: Remove RunPod Instance
         if: always()
