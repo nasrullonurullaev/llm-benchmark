@@ -66,4 +66,21 @@ jobs:
               --dataset-name=random \
               --result-filename "output.json" \
               --model "${{ inputs.model }}" \
+              --save-result benchmark_result.json \
               --seed 12345
+
+      - name: Install Dependencies
+        run: ls
+
+      - name: Install Dependencies
+        run: ls vllm/benchmarks
+
+      - name: Archive Benchmark Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: benchmark-results
+          path: benchmark_result.json
+
+      - name: Remove RunPod Instance
+        if: always()
+        run: runpodctl remove pod $POD_ID
