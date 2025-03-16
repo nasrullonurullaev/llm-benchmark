@@ -65,6 +65,7 @@ jobs:
               --base-url "http://$ENDPOINT" \
               --dataset-name=random \
               --model "${{ inputs.model }}" \
+              --result-filename "benchmark_result.json" \
               --save-result \
               --seed 12345
 
@@ -73,6 +74,12 @@ jobs:
 
       - name: Install Dependencies
         run: ls vllm/benchmarks
+
+      - name: Archive Benchmark Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: vllm/benchmarks/benchmark_result.json        
 
 
       - name: Remove RunPod Instance
