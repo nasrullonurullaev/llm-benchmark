@@ -1,21 +1,22 @@
-name: Vllm benchmark
+name: vLLM Benchmark
 
 on:
   workflow_dispatch:
     inputs:
       model:
-        description: 'Model to benchmark'
+        description: "Model to benchmark"
         required: true
-        default: "neuralmagic/Meta-Llama-3.1-8B-Instruct-FP8"  
+        default: "neuralmagic/Meta-Llama-3.1-8B-Instruct-FP8"
 
 jobs:
-  deploy:
+  benchmark:
+    name: Run vLLM Benchmark
     runs-on: ubuntu-latest
     env:
       GPU_TYPE: "NVIDIA RTX 2000 Ada Generation"
       IMAGE_NAME: "vllm/vllm-openai:latest"
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Install runpodctl
@@ -23,39 +24,41 @@ jobs:
 
       - name: Configure runpodctl
         run: runpodctl config --apiKey ${{ secrets.API_KEY }} || ls ~/runners
-        
-      - name: Create RunPod pod
+
+      - name: Create RunPod Instance
         run: |
-          CREATE_OUTPUT=$(runpodctl create pod --ports '8000/tcp' --secureCloud --gpuType "$GPU_TYPE" --imageName "$IMAGE_NAME" --args "--model ${{ inputs.model }} --max-model-len 4096 --port 8000 --enforce-eager --gpu-memory-utilization 0.95")
+          CREATE_OUTPUT=$(runpodctl create pod \
+            --ports "8000/tcp" \
+            --secureCloud \
+            --gpuType "$GPU_TYPE" \
+            --imageName "$IMAGE_NAME" \
+            --args "--model ${{ inputs.model }} --max-model-len 4096 --port 8000 --enforce-eager --gpu-memory-utilization 0.95")
           POD_ID=$(echo "$CREATE_OUTPUT" | awk -F'"' '/pod "/ {print $2}')
           echo "POD_ID=$POD_ID" >> $GITHUB_ENV
 
-      - name: Wait for pod to be ready
-        run: sleep 60         
+      - name: Wait for Pod to Be Ready
+        run: sleep 60
 
-      - name: Get RunPod pod details
+      - name: Retrieve RunPod Endpoint
         run: |
           ENDPOINT=$(echo "$(runpodctl get pod $POD_ID -a)" | grep -oP '\d+\.\d+\.\d+\.\d+:\d+(?=->8000)')
           echo "ENDPOINT=$ENDPOINT" >> $GITHUB_ENV
-      
-      - name: Set up Python
+
+      - name: Set Up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
-   
-      - name: Clone vLLM repository
+          python-version: "3.12"
+
+      - name: Clone vLLM Repository
         run: |
           git clone https://github.com/vllm-project/vllm
           cd vllm
           VLLM_USE_PRECOMPILED=1 pip install --editable .
 
-      - name: Install dependency
-        run: pip install pandas datasets       
-      
-      - name: Install dependency
-        run: pip install -U pynvml
-        
-      - name: Run benchmark
+      - name: Install Dependencies
+        run: pip install pandas datasets pynvml
+
+      - name: Run Benchmark
         run: |
           cd vllm/benchmarks
           python3 benchmark_serving.py --backend openai \
@@ -65,16 +68,6 @@ jobs:
               --model "${{ inputs.model }}" \
               --seed 12345
 
-      - name: Install dependency
-        run: ls -l vllm/benchmarks
-        
-      - name: Archive benchmark results
-        uses: actions/upload-artifact@v4
-        with:
-          name: vllm-results
-          path: output.json
-          
-      - name: Remove RunPod pod
-#        if: always()
+      - name: Remove RunPod Instance
+        if: always()
         run: runpodctl remove pod $POD_ID
-              
