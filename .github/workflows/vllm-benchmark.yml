@@ -70,4 +70,4 @@ jobs:
 
       - name: Remove RunPod Instance
         if: always()
-        run: runpodctl remove pod $POD_ID
+#        run: runpodctl remove pod $POD_ID
