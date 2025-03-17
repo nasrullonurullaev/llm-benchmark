@@ -4,27 +4,28 @@ on:
   workflow_dispatch:
     inputs:
       model:
-        description: 'Model to benchmark'
+        description: "Model to benchmark"
         required: true
-        default: 'deepseek-r1:8b'
+        default: "deepseek-r1:8b"
       samples:
-        description: 'Number of samples'
+        description: "Number of samples"
         required: false
-        default: '10'
+        default: "10"
       language:
-        description: 'Benchmark language (python or js)'
+        description: "Benchmark language (python or js)"
         required: true
-        default: 'python'        
+        default: "python"        
 
 env:
   GPU_TYPE: "NVIDIA RTX 2000 Ada Generation"
   IMAGE_NAME: "ollama/ollama"
 
 jobs:
-  deploy:
+  benchmark:
+    name: Run Benchllama Benchmark
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Install runpodctl
@@ -36,7 +37,7 @@ jobs:
 
       - name: Create RunPod pod
         run: |
-          CREATE_OUTPUT=$(runpodctl create pod --ports '11434/tcp' --secureCloud --gpuType "$GPU_TYPE" --imageName "$IMAGE_NAME")
+          CREATE_OUTPUT=$(runpodctl create pod --ports "11434/tcp" --secureCloud --gpuType "$GPU_TYPE" --imageName "$IMAGE_NAME")
           POD_ID=$(echo "$CREATE_OUTPUT" | awk -F'"' '/pod "/ {print $2}')
           echo "POD_ID=$POD_ID" >> $GITHUB_ENV
 
@@ -48,7 +49,7 @@ jobs:
           ENDPOINT=$(echo "$(runpodctl get pod $POD_ID -a)" | grep -oP '(?<=\s)\d+\.\d+\.\d+\.\d+:\d+(?=->11434)')
           echo "ENDPOINT=$ENDPOINT" >> $GITHUB_ENV
 
-      - name: Pull model
+      - name: Pull Model
         run: |
           curl -X POST "http://$ENDPOINT/api/pull" \
           -H "Content-Type: application/json" \
@@ -57,7 +58,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
       - name: Install Benchllama
         run: pip install benchllama
@@ -72,12 +73,12 @@ jobs:
             --dataset "data/${{ inputs.language }}/humanevalpack.jsonl" \
             --provider-url "http://$ENDPOINT"
 
-      - name: Archive benchmark results
+      - name: Archive Benchmark Results
         uses: actions/upload-artifact@v4
         with:
           name: benchllama-results
           path: /tmp/benchllama
           
-      - name: Remove RunPod pod
+      - name: Remove RunPod Pod
         if: always()
         run: runpodctl remove pod $POD_ID
