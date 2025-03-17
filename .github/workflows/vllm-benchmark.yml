@@ -45,7 +45,7 @@ jobs:
           ENDPOINT=$(echo "$(runpodctl get pod $POD_ID -a)" | grep -oP '\d+\.\d+\.\d+\.\d+:\d+(?=->8000)')
           echo "ENDPOINT=$ENDPOINT" >> $GITHUB_ENV
 
-      - name: Set up Python Environment
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
