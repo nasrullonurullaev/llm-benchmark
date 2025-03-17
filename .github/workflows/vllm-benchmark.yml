@@ -1,4 +1,4 @@
-name: vLLM Benchmark
+name: Run vLLM Benchmark
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ on:
         default: "neuralmagic/Meta-Llama-3.1-8B-Instruct-FP8"
 
 jobs:
-  benchmark:
+  run-vllm-benchmark:
     name: Run vLLM Benchmark
     runs-on: ubuntu-latest
     env:
@@ -19,14 +19,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install runpodctl
+      - name: Install RunPod CLI
         run: wget -qO- cli.runpod.net | sudo bash
 
-      - name: Configure runpodctl
-        run: runpodctl config
-
-      - name: Configure runpodctl
+      - name: Configure RunPod CLI
         run: runpodctl config --apiKey ${{ secrets.API_KEY }}
+        continue-on-error: true
 
       - name: Create RunPod Instance
         run: |
@@ -39,7 +37,7 @@ jobs:
           POD_ID=$(echo "$CREATE_OUTPUT" | awk -F'"' '/pod "/ {print $2}')
           echo "POD_ID=$POD_ID" >> $GITHUB_ENV
 
-      - name: Wait for Pod to Be Ready
+      - name: Wait for RunPod Instance
         run: sleep 60
 
       - name: Retrieve RunPod Endpoint
@@ -47,21 +45,21 @@ jobs:
           ENDPOINT=$(echo "$(runpodctl get pod $POD_ID -a)" | grep -oP '\d+\.\d+\.\d+\.\d+:\d+(?=->8000)')
           echo "ENDPOINT=$ENDPOINT" >> $GITHUB_ENV
 
-      - name: Set Up Python
+      - name: Set up Python Environment
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
 
-      - name: Clone vLLM Repository
+      - name: Clone and Build vLLM
         run: |
           git clone https://github.com/vllm-project/vllm
           cd vllm
           VLLM_USE_PRECOMPILED=1 pip install --editable .
 
-      - name: Install Dependencies
+      - name: Install Benchmark Dependencies
         run: pip install pandas datasets pynvml
 
-      - name: Run Benchmark
+      - name: Run vLLM Benchmark
         run: |
           cd vllm/benchmarks
           python3 benchmark_serving.py --backend openai \
@@ -72,14 +70,14 @@ jobs:
               --save-result \
               --seed 12345 | tee benchmark_output.log
 
-      - name: Output Benchmark Summary
+      - name: Generate Benchmark Summary
         run: |
           echo "### Serving Benchmark Result" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
           grep -A 20 "============ Serving Benchmark Result" vllm/benchmarks/benchmark_output.log >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
 
-      - name: Archive Benchmark Results
+      - name: Upload Benchmark Results
         uses: actions/upload-artifact@v4
         with:
           name: benchmark-results
