@@ -16,14 +16,13 @@ on:
         required: true
         default: "python"        
 
-env:
-  GPU_TYPE: "NVIDIA RTX 2000 Ada Generation"
-  IMAGE_NAME: "ollama/ollama"
-
 jobs:
   benchmark:
     name: Run Benchllama Benchmark
     runs-on: ubuntu-latest
+    env:
+      GPU_TYPE: "NVIDIA RTX 2000 Ada Generation"
+      IMAGE_NAME: "ollama/ollama"
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
