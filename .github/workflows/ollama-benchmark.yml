@@ -74,15 +74,8 @@ jobs:
 
       - name: Output Benchmark Results to Summary
         run: |
-          echo "## 📊 Benchllama Benchmark Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 🔍 Model: `${{ inputs.model }}`" >> $GITHUB_STEP_SUMMARY
-          echo "### 🧪 Samples: `${{ inputs.samples }}`" >> $GITHUB_STEP_SUMMARY
-          echo "### 📝 Language: `${{ inputs.language }}`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          cat results.log >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY            
+          echo "## Benchllama Benchmark Results" >> $GITHUB_STEP_SUMMARY
+          cat results.log >> $GITHUB_STEP_SUMMARY           
 
       - name: Archive Benchmark Results
         uses: actions/upload-artifact@v4
