@@ -70,7 +70,7 @@ jobs:
             --samples "${{ inputs.samples }}" \
             --languages "${{ inputs.language }}" \
             --dataset "data/${{ inputs.language }}/humanevalpack.jsonl" \
-            --provider-url "http://$ENDPOINT" | tee /tmp/benchllama/results.log
+            --provider-url "http://$ENDPOINT" | tee results.log
 
       - name: Output Benchmark Results to Summary
         run: |
@@ -81,7 +81,7 @@ jobs:
           echo "### 📝 Language: `${{ inputs.language }}`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          cat /tmp/benchllama/results.log >> $GITHUB_STEP_SUMMARY
+          cat results.log >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY            
 
       - name: Archive Benchmark Results
