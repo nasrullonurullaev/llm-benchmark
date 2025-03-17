@@ -9,7 +9,7 @@ on:
         default: "neuralmagic/Meta-Llama-3.1-8B-Instruct-FP8"
 
 jobs:
-  run-vllm-benchmark:
+  benchmark:
     name: Run vLLM Benchmark
     runs-on: ubuntu-latest
     env:
