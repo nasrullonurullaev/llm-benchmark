@@ -22,8 +22,11 @@ jobs:
       - name: Install runpodctl
         run: wget -qO- cli.runpod.net | sudo bash
 
+      - name: Wait for Pod to Be Ready
+        run: sleep 60        
+
       - name: Configure runpodctl
-        run: runpodctl config --apiKey ${{ secrets.API_KEY }} || ls ~/runners
+        run: runpodctl config --apiKey ${{ secrets.API_KEY }}
 
       - name: Create RunPod Instance
         run: |
