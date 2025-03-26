@@ -57,10 +57,17 @@ jobs:
           pip install -e .
           pip install -e ."[api]"
 
-      - name: Run Lm Evaluation Harness Benchmark
+      - name: Run LM Evaluation Harness Benchmark
         run: |
-          lm_eval --model local-completions --tasks humaneval --trust_remote_code --confirm_run_unsafe_code --limit 2 --model_args model=${{ inputs.model }},base_url=http://$ENDPOINT/v1/completions,num_concurrent=1,max_retries=3,tokenized_requests=False
+          lm_eval \
+            --model local-completions \
+            --tasks humaneval \
+            --trust_remote_code \
+            --confirm_run_unsafe_code \
+            --limit 2 \
+            --model_args model=${{ inputs.model }},base_url=http://$ENDPOINT/v1/completions,num_concurrent=1,max_retries=3,tokenized_requests=False
 
       - name: Remove RunPod Pod
         if: always()
-        run: runpodctl remove pod $POD_ID          
+        run: runpodctl remove pod $POD_ID
+         
