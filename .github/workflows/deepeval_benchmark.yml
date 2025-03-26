@@ -1,0 +1,67 @@
+name: Run vLLM Benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: "Model to benchmark"
+        required: true
+        default: "neuralmagic/Meta-Llama-3.1-8B-Instruct-FP8"
+
+jobs:
+  benchmark:
+    name: Run vLLM Benchmark
+    runs-on: ubuntu-latest
+    env:
+      GPU_TYPE: "NVIDIA RTX 2000 Ada Generation"
+      IMAGE_NAME: "vllm/vllm-openai:latest"
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install RunPod CLI
+        run: wget -qO- cli.runpod.net | sudo bash
+
+      - name: Configure RunPod CLI
+        run: runpodctl config --apiKey ${{ secrets.API_KEY }}
+        continue-on-error: true
+
+      - name: Create RunPod Instance
+        run: |
+          CREATE_OUTPUT=$(runpodctl create pod \
+            --ports "8000/tcp" \
+            --secureCloud \
+            --gpuType "$GPU_TYPE" \
+            --imageName "$IMAGE_NAME" \
+            --args "--model ${{ inputs.model }} --max-model-len 4096 --port 8000 --enforce-eager --gpu-memory-utilization 0.95 --api-key nasrullo")
+          POD_ID=$(echo "$CREATE_OUTPUT" | awk -F'"' '/pod "/ {print $2}')
+          echo "POD_ID=$POD_ID" >> $GITHUB_ENV
+
+      - name: Wait for RunPod Instance
+        run: sleep 60
+
+      - name: Retrieve RunPod Endpoint
+        run: |
+          ENDPOINT=$(echo "$(runpodctl get pod $POD_ID -a)" | grep -oP '\d+\.\d+\.\d+\.\d+:\d+(?=->8000)')
+          echo "ENDPOINT=$ENDPOINT" >> $GITHUB_ENV
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install Benchmark
+        run: pip install -U deepeval
+
+      - name: Run DeepEval Benchmark
+        run: |
+          deepeval set-local-model --model-name=${{ inputs.model }} \
+            --base-url="http://$ENDPOINT/v1/" \
+            --api-key=nasrullo
+          deepeval test run test_llm.py  
+
+      - name: Upload Benchmark Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: vllm/benchmarks/benchmark_result.json        
