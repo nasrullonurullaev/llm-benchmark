@@ -1,4 +1,4 @@
-name: Run vLLM Benchmark
+name: Run DeepEval Benchmark
 
 on:
   workflow_dispatch:
@@ -38,7 +38,7 @@ jobs:
           echo "POD_ID=$POD_ID" >> $GITHUB_ENV
 
       - name: Wait for RunPod Instance
-        run: sleep 60
+        run: sleep 80
 
       - name: Retrieve RunPod Endpoint
         run: |
