@@ -56,7 +56,10 @@ jobs:
           cd lm-evaluation-harness
           pip install -e .
           pip install -e ."[api]"
-
+          
+      - name: var
+        run: export HF_ALLOW_CODE_EVAL="1"
+        
       - name: Run LM Evaluation Harness Benchmark
         run: |
           lm_eval \
