@@ -1,0 +1,66 @@
+name: Run Lm Evaluation Harness Benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: "Model to benchmark"
+        required: true
+        default: "neuralmagic/Meta-Llama-3.1-8B-Instruct-FP8"
+
+jobs:
+  benchmark:
+    name: Run Lm Evaluation Harness Benchmark
+    runs-on: ubuntu-latest
+    env:
+      GPU_TYPE: "NVIDIA RTX 2000 Ada Generation"
+      IMAGE_NAME: "vllm/vllm-openai:latest"
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install RunPod CLI
+        run: wget -qO- cli.runpod.net | sudo bash
+
+      - name: Configure RunPod CLI
+        run: runpodctl config --apiKey ${{ secrets.API_KEY }}
+        continue-on-error: true
+
+      - name: Create RunPod Instance
+        run: |
+          CREATE_OUTPUT=$(runpodctl create pod \
+            --ports "8000/tcp" \
+            --secureCloud \
+            --gpuType "$GPU_TYPE" \
+            --imageName "$IMAGE_NAME" \
+            --args "--model ${{ inputs.model }} --max-model-len 4096 --port 8000 --enforce-eager --gpu-memory-utilization 0.95")
+          POD_ID=$(echo "$CREATE_OUTPUT" | awk -F'"' '/pod "/ {print $2}')
+          echo "POD_ID=$POD_ID" >> $GITHUB_ENV
+
+      - name: Wait for RunPod Instance
+        run: sleep 60
+
+      - name: Retrieve RunPod Endpoint
+        run: |
+          ENDPOINT=$(echo "$(runpodctl get pod $POD_ID -a)" | grep -oP '\d+\.\d+\.\d+\.\d+:\d+(?=->8000)')
+          echo "ENDPOINT=$ENDPOINT" >> $GITHUB_ENV
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Clone and Build Lm Evaluation Harness
+        run: |
+          git clone --depth 1 https://github.com/EleutherAI/lm-evaluation-harness
+          cd lm-evaluation-harness
+          pip install -e .
+          pip install -e ."[api]"
+
+      - name: Run Lm Evaluation Harness Benchmark
+        run: |
+          lm_eval --model local-completions --tasks humaneval --trust_remote_code --confirm_run_unsafe_code --limit 2 --model_args model=${{ inputs.model }},base_url=http://$ENDPOINT/v1/completions,num_concurrent=1,max_retries=3,tokenized_requests=False
+
+      - name: Remove RunPod Pod
+        if: always()
+        run: runpodctl remove pod $POD_ID          
