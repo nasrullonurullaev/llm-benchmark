@@ -11,6 +11,10 @@ on:
         description: "Dataset task to evaluate"
         required: true
         default: "humaneval"
+      limits:
+        description: "Number of samples"
+        required: false
+        default: "10"
 
 jobs:
   benchmark:
@@ -73,8 +77,8 @@ jobs:
             --confirm_run_unsafe_code \
             --log_samples \
             --output_path /tmp/lm-evaluation-harness/ \
-            --limit 2 \
-            --model_args model=${{ inputs.model }},base_url=http://$ENDPOINT/v1/completions,num_concurrent=1,max_retries=3,tokenized_requests=False | tee benchmark_output.log
+            --limit ${{ inputs.limits }} \
+            --model_args model=${{ inputs.model }},base_url=http://$ENDPOINT/v1/completions,num_concurrent=2,max_retries=3,tokenized_requests=False | tee benchmark_output.log
       
       - name: Output Benchmark Results to Summary
         run: |
