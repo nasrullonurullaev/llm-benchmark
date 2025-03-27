@@ -58,7 +58,13 @@ jobs:
           deepeval set-local-model --model-name=${{ inputs.model }} \
             --base-url="http://$ENDPOINT/v1/" \
             --api-key=nasrullo
-          deepeval test run test_llm.py  
+          deepeval test run -vv test_llm.py | tee benchmark_output.log
+
+      - name: Output Benchmark Results to Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          awk '/Test Results/,0' benchmark_output.log >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Upload Benchmark Results
         uses: actions/upload-artifact@v4
