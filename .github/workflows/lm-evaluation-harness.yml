@@ -1,4 +1,4 @@
-name: Run Lm Evaluation Harness Benchmark
+name: Run LM Evaluation Harness Benchmark
 
 on:
   workflow_dispatch:
@@ -10,12 +10,13 @@ on:
 
 jobs:
   benchmark:
-    name: Run Lm Evaluation Harness Benchmark
+    name: Run LM Evaluation Harness Benchmark
     runs-on: ubuntu-latest
     env:
       GPU_TYPE: "NVIDIA RTX 2000 Ada Generation"
       IMAGE_NAME: "vllm/vllm-openai:latest"
       HF_ALLOW_CODE_EVAL: "1"
+    
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -38,26 +39,26 @@ jobs:
           POD_ID=$(echo "$CREATE_OUTPUT" | awk -F'"' '/pod "/ {print $2}')
           echo "POD_ID=$POD_ID" >> $GITHUB_ENV
 
-      - name: Wait for RunPod Instance
+      - name: Wait for RunPod Instance to Start
         run: sleep 120
 
       - name: Retrieve RunPod Endpoint
         run: |
-          ENDPOINT=$(echo "$(runpodctl get pod $POD_ID -a)" | grep -oP '\d+\.\d+\.\d+\.\d+:\d+(?=->8000)')
+          ENDPOINT=$(runpodctl get pod $POD_ID -a | grep -oP '\d+\.\d+\.\d+\.\d+:\d+(?=->8000)')
           echo "ENDPOINT=$ENDPOINT" >> $GITHUB_ENV
 
-      - name: Set up Python
+      - name: Set up Python Environment
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
 
-      - name: Clone and Build Lm Evaluation Harness
+      - name: Clone and Install LM Evaluation Harness
         run: |
           git clone --depth 1 https://github.com/EleutherAI/lm-evaluation-harness
           cd lm-evaluation-harness
           pip install -e .
           pip install -e ."[api]"
-                  
+
       - name: Run LM Evaluation Harness Benchmark
         run: |
           lm_eval \
@@ -71,4 +72,3 @@ jobs:
       - name: Remove RunPod Pod
         if: always()
         run: runpodctl remove pod $POD_ID
-         
