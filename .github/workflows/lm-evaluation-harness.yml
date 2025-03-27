@@ -39,7 +39,7 @@ jobs:
           POD_ID=$(echo "$CREATE_OUTPUT" | awk -F'"' '/pod "/ {print $2}')
           echo "POD_ID=$POD_ID" >> $GITHUB_ENV
 
-      - name: Wait for RunPod Instance to Start
+      - name: Wait for RunPod Instance
         run: sleep 120
 
       - name: Retrieve RunPod Endpoint
@@ -47,7 +47,7 @@ jobs:
           ENDPOINT=$(runpodctl get pod $POD_ID -a | grep -oP '\d+\.\d+\.\d+\.\d+:\d+(?=->8000)')
           echo "ENDPOINT=$ENDPOINT" >> $GITHUB_ENV
 
-      - name: Set up Python Environment
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
