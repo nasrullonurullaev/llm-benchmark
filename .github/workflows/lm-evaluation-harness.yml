@@ -72,7 +72,7 @@ jobs:
             --trust_remote_code \
             --confirm_run_unsafe_code \
             --log_samples \
-            --output_path /tmp \
+            --output_path /tmp/lm-evaluation-harness/ \
             --limit 2 \
             --model_args model=${{ inputs.model }},base_url=http://$ENDPOINT/v1/completions,num_concurrent=1,max_retries=3,tokenized_requests=False | tee benchmark_output.log
       
@@ -89,4 +89,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: benchmark-results
-          path: /tmp 
+          path: /tmp/lm-evaluation-harness
