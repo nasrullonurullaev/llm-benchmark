@@ -72,7 +72,14 @@ jobs:
             --trust_remote_code \
             --confirm_run_unsafe_code \
             --limit 2 \
-            --model_args model=${{ inputs.model }},base_url=http://$ENDPOINT/v1/completions,num_concurrent=1,max_retries=3,tokenized_requests=False
+            --model_args model=${{ inputs.model }},base_url=http://$ENDPOINT/v1/completions,num_concurrent=1,max_retries=3,tokenized_requests=False | tee benchmark_output.log
+      
+      - name: Output Benchmark Results to Summary
+        run: |
+          echo "### Benchmark Results" >> $GITHUB_STEP_SUMMARY
+          tail -n 10 benchmark_output.log | awk '/\| *Tasks *\|Version\|/{flag=1} flag' >> $GITHUB_STEP_SUMMARY
+
+            
 
       - name: Remove RunPod Pod
         if: always()
