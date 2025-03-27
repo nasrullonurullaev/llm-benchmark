@@ -20,7 +20,7 @@ jobs:
       GPU_TYPE: "NVIDIA RTX 2000 Ada Generation"
       IMAGE_NAME: "vllm/vllm-openai:latest"
       HF_ALLOW_CODE_EVAL: "1"
-      LLM_API_KEY: "${{ secrets.LLM_API_KEY }}"
+      OPENAI_API_KEY: "${{ secrets.LLM_API_KEY }}"
     
     steps:
       - name: Checkout Repository
@@ -40,7 +40,7 @@ jobs:
             --secureCloud \
             --gpuType "$GPU_TYPE" \
             --imageName "$IMAGE_NAME" \
-            --args "--model ${{ inputs.model }} --max-model-len 4096 --port 8000 --enforce-eager --gpu-memory-utilization 0.95 --api-key $LLM_API_KEY")
+            --args "--model ${{ inputs.model }} --max-model-len 4096 --port 8000 --enforce-eager --gpu-memory-utilization 0.95 --api-key $OPENAI_API_KEY")
           POD_ID=$(echo "$CREATE_OUTPUT" | awk -F'"' '/pod "/ {print $2}')
           echo "POD_ID=$POD_ID" >> $GITHUB_ENV
 
