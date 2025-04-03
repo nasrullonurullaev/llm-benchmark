@@ -7,6 +7,10 @@ on:
         description: "Model to benchmark"
         required: true
         default: "neuralmagic/Meta-Llama-3.1-8B-Instruct-FP8"
+      num_prompts:
+        description: "Number of prompts"
+        required: false
+        default: "20"
 
 jobs:
   benchmark:
@@ -69,7 +73,7 @@ jobs:
               --result-filename "benchmark_result.json" \
               --save-result \
               --seed 12345 \
-              --num-prompts 20 | tee benchmark_output.log
+              --num-prompts ${{ inputs.num_prompts }} | tee benchmark_output.log
 
       - name: Generate Benchmark Summary
         run: |
