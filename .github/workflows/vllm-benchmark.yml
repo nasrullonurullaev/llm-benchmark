@@ -68,6 +68,7 @@ jobs:
               --model "${{ inputs.model }}" \
               --result-filename "benchmark_result.json" \
               --save-result \
+              --num-prompts 20 \ 
               --seed 12345 | tee benchmark_output.log
 
       - name: Generate Benchmark Summary
