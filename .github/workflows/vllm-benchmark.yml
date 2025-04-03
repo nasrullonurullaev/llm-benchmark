@@ -84,3 +84,7 @@ jobs:
         with:
           name: benchmark-results
           path: vllm/benchmarks/benchmark_result.json        
+
+      - name: Remove RunPod Pod
+        if: always()
+        run: runpodctl remove pod $POD_ID
