@@ -85,9 +85,7 @@ jobs:
           echo "### Benchmark Results" >> $GITHUB_STEP_SUMMARY
           tail -n 10 benchmark_output.log | awk '/\| *Tasks *\|Version\|/{flag=1} flag' >> $GITHUB_STEP_SUMMARY
 
-      - name: Remove RunPod Pod
-        if: always()
-        run: runpodctl remove pod $POD_ID
+
 
       - name: Upload Benchmark Results
         uses: actions/upload-artifact@v4
