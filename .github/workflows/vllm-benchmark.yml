@@ -42,7 +42,7 @@ jobs:
           echo "POD_ID=$POD_ID" >> $GITHUB_ENV
 
       - name: Wait for RunPod Instance
-        run: sleep 200
+        run: sleep 180
 
       - name: Retrieve RunPod Endpoint
         run: |
@@ -58,7 +58,7 @@ jobs:
         run: |
           git clone https://github.com/vllm-project/vllm
           cd vllm
-          VLLM_USE_PRECOMPILED=1 pip install --editable .
+          VLLM_USE_PRECOMPILED=1 pip install --no-cache-dir --editable .
 
       - name: Install Benchmark Dependencies
         run: pip install pandas datasets pynvml
