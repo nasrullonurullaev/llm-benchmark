@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install RunPod CLI
-        run: wget --quiet --show-progress https://github.com/Run-Pod/runpodctl/releases/download/v1.14.3/runpodctl-linux-amd64 -O runpodctl && chmod +x runpodctl && sudo cp runpodctl /usr/bin/runpodctl
+        run: wget --quiet --show-progress https://github.com/Run-Pod/runpodctl/releases/download/v1.14.3/runpodctl-linux-amd64 -O runpodctl && chmod +x runpodctl && sudo cp runpodctl /usr/bin/runpodctl | sudo bash
 
       - name: Configure RunPod CLI
         run: runpodctl config --apiKey ${{ secrets.API_KEY }}
