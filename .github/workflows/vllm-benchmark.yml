@@ -56,9 +56,9 @@ jobs:
 
       - name: Clone and Build vLLM
         run: |
-          git clone https://github.com/vllm-project/vllm
+          git clone https://github.com/vllm-project/vllm.git
           cd vllm
-          VLLM_USE_PRECOMPILED=1 pip install --no-cache-dir --editable .
+          VLLM_USE_PRECOMPILED=1 uv pip install --editable .
 
       - name: Install Benchmark Dependencies
         run: pip install pandas datasets pynvml
