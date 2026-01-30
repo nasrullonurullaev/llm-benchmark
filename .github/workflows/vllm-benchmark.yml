@@ -42,7 +42,7 @@ jobs:
           echo "POD_ID=$POD_ID" >> $GITHUB_ENV
 
       - name: Wait for RunPod Instance
-        run: sleep 120
+        run: sleep 130
 
       - name: Retrieve RunPod Endpoint
         run: |
