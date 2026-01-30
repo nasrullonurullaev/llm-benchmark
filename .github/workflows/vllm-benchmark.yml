@@ -65,15 +65,16 @@ jobs:
 
       - name: Run vLLM Benchmark
         run: |
-          cd vllm/benchmarks
-          python3 benchmark_serving.py --backend openai \
-              --base-url "http://$ENDPOINT" \
-              --dataset-name=random \
-              --model "${{ inputs.model }}" \
-              --result-filename "benchmark_result.json" \
-              --save-result \
-              --num-prompts ${{ inputs.num_prompts }} \
-              --seed 12345 | tee benchmark_output.log
+          vllm bench serve \
+            --backend openai \
+            --base-url "http://$ENDPOINT" \
+            --dataset-name random \
+            --model neuralmagic/Meta-Llama-3.1-8B-Instruct-FP8 \
+            --num-prompts 20 \
+            --seed 12345 \
+            --save-result \
+            --result-filename benchmark_result.json \
+            | tee benchmark_output.log
 
       - name: Generate Benchmark Summary
         run: |
