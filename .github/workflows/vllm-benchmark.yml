@@ -63,12 +63,6 @@ jobs:
           uv venv vllm-env --python 3.12 --seed
           source vllm-env/bin/activate
           uv pip install vllm
-
-      - name: Install Benchmark Dependencies
-        run: pip install pandas datasets pynvml
-
-      - name: Run vLLM Benchmark
-        run: |
           vllm bench serve \
             --backend openai \
             --base-url "http://$ENDPOINT" \
