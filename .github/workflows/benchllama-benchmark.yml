@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v4
         
       - name: Install runpodctl
-        run: wget -qO- cli.runpod.net | sudo bash
+        run: wget --quiet --show-progress https://github.com/Run-Pod/runpodctl/releases/download/v1.14.3/runpodctl-linux-amd64 -O runpodctl && chmod +x runpodctl && sudo cp runpodctl /usr/bin/runpodctl | sudo bash
         
       - name: Configure runpodctl
         run: runpodctl config --apiKey ${{ secrets.API_KEY }} || ls ~/runners
@@ -30,7 +30,7 @@ jobs:
         run: runpodctl start pod ${{ secrets.POD_ID }}
 
       - name: Wait for pod to be ready
-        run: sleep 30  # Adjust if needed to allow the pod time to start
+        run: sleep 220  # Adjust if needed to allow the pod time to start
 
       - name: Pull model
         run: |
