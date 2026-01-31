@@ -14,7 +14,7 @@ on:
       language:
         description: "Benchmark language (python or js)"
         required: true
-        default: "python"        
+        default: "python"
 
 jobs:
   benchmark:
@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install runpodctl
-        run: wget -qO- cli.runpod.net | sudo bash
+        run: wget --quiet --show-progress https://github.com/Run-Pod/runpodctl/releases/download/v1.14.3/runpodctl-linux-amd64 -O runpodctl && chmod +x runpodctl && sudo cp runpodctl /usr/bin/runpodctl | sudo bash
 
       - name: Configure runpodctl
         run: runpodctl config --apiKey ${{ secrets.API_KEY }}
@@ -41,7 +41,7 @@ jobs:
           echo "POD_ID=$POD_ID" >> $GITHUB_ENV
 
       - name: Wait for pod to be ready
-        run: sleep 60         
+        run: sleep 220         
 
       - name: Get RunPod pod details
         run: |
@@ -70,15 +70,15 @@ jobs:
             --samples "${{ inputs.samples }}" \
             --languages "${{ inputs.language }}" \
             --dataset "data/${{ inputs.language }}/humanevalpack.jsonl" \
-            --provider-url "http://$ENDPOINT" | tee results.log
+            --provider-url "http://$ENDPOINT" | tee benchmark_output.log
 
       - name: Output Benchmark Results to Summary
         run: |
           echo "## Benchllama Benchmark Results" >> $GITHUB_STEP_SUMMARY
            echo "" >> $GITHUB_STEP_SUMMARY
            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-           cat results.log >> $GITHUB_STEP_SUMMARY
-           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY         
+           cat benchmark_output.log >> $GITHUB_STEP_SUMMARY
+           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
 
       - name: Archive Benchmark Results
         uses: actions/upload-artifact@v4
