@@ -24,7 +24,8 @@ jobs:
         run: wget --quiet --show-progress https://github.com/Run-Pod/runpodctl/releases/download/v1.14.3/runpodctl-linux-amd64 -O runpodctl && chmod +x runpodctl && sudo cp runpodctl /usr/bin/runpodctl | sudo bash
         
       - name: Configure runpodctl
-        run: runpodctl config --apiKey ${{ secrets.API_KEY }} || ls ~/runners
+        run: runpodctl config --apiKey ${{ secrets.API_KEY }}
+        continue-on-error: true
 
       - name: Start Ollama pod
         run: runpodctl start pod ${{ secrets.POD_ID }}
