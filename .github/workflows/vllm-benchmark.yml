@@ -78,7 +78,7 @@ jobs:
         run: |
           echo "## vLLM Benchmark Result" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          grep -A 20 "============ Serving Benchmark Result" vllm/benchmarks/benchmark_output.log >> $GITHUB_STEP_SUMMARY
+          grep -A 20 "============ Serving Benchmark Result" benchmark_output.log >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload Benchmark Results
