@@ -25,7 +25,7 @@ jobs:
       IMAGE_NAME: "vllm/vllm-openai:latest"
       HF_ALLOW_CODE_EVAL: "1"
       OPENAI_API_KEY: "${{ secrets.LLM_API_KEY }}"
-    
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -63,7 +63,7 @@ jobs:
 
       - name: Install Transformers
         run: |
-          pip install transformers          
+          pip install transformers
 
       - name: Clone and Install LM Evaluation Harness
         run: |
@@ -83,13 +83,15 @@ jobs:
             --output_path /tmp/lm-evaluation-harness/ \
             --limit ${{ inputs.limits }} \
             --model_args model=${{ inputs.model }},base_url=http://$ENDPOINT/v1/completions,num_concurrent=2,max_retries=3,tokenized_requests=False | tee benchmark_output.log
-      
+
       - name: Output Benchmark Results to Summary
         run: |
           echo "### Benchmark Results" >> $GITHUB_STEP_SUMMARY
           tail -n 10 benchmark_output.log | awk '/\| *Tasks *\|Version\|/{flag=1} flag' >> $GITHUB_STEP_SUMMARY
 
-
+      - name: Remove RunPod Pod
+        if: always()
+        run: runpodctl remove pod $POD_ID
 
       - name: Upload Benchmark Results
         uses: actions/upload-artifact@v4
