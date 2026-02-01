@@ -61,6 +61,10 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install Transformers
+        run: |
+          pip install transformers          
+
       - name: Clone and Install LM Evaluation Harness
         run: |
           git clone --depth 1 https://github.com/EleutherAI/lm-evaluation-harness
