@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       gpu_type:
-        description: "GPU type"
+        description: "GPU Type"
         required: false
         default: "NVIDIA RTX 2000 Ada Generation"
       model:
@@ -15,10 +15,6 @@ on:
         description: "Dataset Name"
         required: false
         default: "random"
-      dataset_path:
-        description: "Dataset Path"
-        required: false
-        default: ""
       num_prompts:
         description: "Number of prompts"
         required: false
@@ -78,7 +74,6 @@ jobs:
             --backend openai \
             --base-url "http://$ENDPOINT" \
             --dataset-name ${{ inputs.dataset_name }} \
-            --dataset-path ${{ inputs.dataset_path }} \
             --model ${{ inputs.model }} \
             --num-prompts ${{ inputs.num_prompts }} \
             --seed 12345 \
