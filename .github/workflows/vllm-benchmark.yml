@@ -15,6 +15,10 @@ on:
         description: "Dataset Name"
         required: false
         default: "random"
+      dataset_path:
+        description: "Dataset Path"
+        required: false
+        default: ""        
       num_prompts:
         description: "Number of prompts"
         required: false
@@ -49,7 +53,7 @@ jobs:
           echo "POD_ID=$POD_ID" >> $GITHUB_ENV
 
       - name: Wait for RunPod Instance
-        run: sleep 210
+        run: sleep 220
 
       - name: Retrieve RunPod Endpoint
         run: |
@@ -63,17 +67,20 @@ jobs:
 
       - name: Install uv
         run: |
-          python -m pip install uv 
+          python -m pip install uv
+          
 
-      - name: Clone and Build vLLM
+      - name: Install and Run vLLM Benchmark
         run: |
           uv venv vllm-env --python 3.12 --seed
           source vllm-env/bin/activate
+          uv pip install datasets
           uv pip install vllm
           vllm bench serve \
             --backend openai \
             --base-url "http://$ENDPOINT" \
             --dataset-name ${{ inputs.dataset_name }} \
+            --dataset-path ${{ inputs.dataset_path }} \
             --model ${{ inputs.model }} \
             --num-prompts ${{ inputs.num_prompts }} \
             --seed 12345 \
