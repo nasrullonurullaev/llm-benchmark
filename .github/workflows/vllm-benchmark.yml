@@ -65,11 +65,18 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Prepare dataset args
+        run: |
+          DATASET_ARGS="--dataset-name ${{ inputs.dataset_name }}"
+          if [ -n "${{ inputs.dataset_path }}" ]; then
+            DATASET_ARGS="$DATASET_ARGS --dataset-path ${{ inputs.dataset_path }}"
+          fi
+          echo "DATASET_ARGS=$DATASET_ARGS" >> $GITHUB_ENV
+    
       - name: Install uv
         run: |
           python -m pip install uv
           
-
       - name: Install and Run vLLM Benchmark
         run: |
           uv venv vllm-env --python 3.12 --seed
@@ -79,8 +86,7 @@ jobs:
           vllm bench serve \
             --backend openai \
             --base-url "http://$ENDPOINT" \
-            --dataset-name ${{ inputs.dataset_name }} \
-            --dataset-path ${{ inputs.dataset_path }} \
+            $DATASET_ARGS \
             --model ${{ inputs.model }} \
             --num-prompts ${{ inputs.num_prompts }} \
             --seed 12345 \
@@ -99,7 +105,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: benchmark-results
-          path: vllm/benchmarks/benchmark_result.json
+          path: benchmark_result.json
 
       - name: Remove RunPod Pod
         if: always()
