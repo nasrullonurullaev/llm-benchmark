@@ -3,10 +3,22 @@ name: Run vLLM Benchmark
 on:
   workflow_dispatch:
     inputs:
+      gpu_type:
+        description: "GPU type"
+        required: false
+        default: "NVIDIA RTX 2000 Ada Generation"
       model:
         description: "Model to benchmark"
         required: true
         default: "neuralmagic/Meta-Llama-3.1-8B-Instruct-FP8"
+      dataset_name:
+        description: "Dataset Name"
+        required: false
+        default: "random"
+      dataset_path:
+        description: "Dataset Path"
+        required: false
+        default: ""
       num_prompts:
         description: "Number of prompts"
         required: false
@@ -17,7 +29,6 @@ jobs:
     name: Run vLLM Benchmark
     runs-on: ubuntu-latest
     env:
-      GPU_TYPE: "NVIDIA RTX 2000 Ada Generation"
       IMAGE_NAME: "vllm/vllm-openai:latest"
     steps:
       - name: Checkout Repository
@@ -35,7 +46,7 @@ jobs:
           CREATE_OUTPUT=$(runpodctl create pod \
             --ports "8000/tcp" \
             --secureCloud \
-            --gpuType "$GPU_TYPE" \
+            --gpuType "${{ inputs.gpu_type }}" \
             --imageName "$IMAGE_NAME" \
             --args "--model ${{ inputs.model }} --max-model-len 4096 --port 8000 --enforce-eager --gpu-memory-utilization 0.95")
           POD_ID=$(echo "$CREATE_OUTPUT" | awk -F'"' '/pod "/ {print $2}')
@@ -66,9 +77,10 @@ jobs:
           vllm bench serve \
             --backend openai \
             --base-url "http://$ENDPOINT" \
-            --dataset-name random \
-            --model neuralmagic/Meta-Llama-3.1-8B-Instruct-FP8 \
-            --num-prompts 20 \
+            --dataset-name ${{ inputs.dataset_name }} \
+            --dataset-path ${{ inputs.dataset_path }} \
+            --model ${{ inputs.model }} \
+            --num-prompts ${{ inputs.num_prompts }} \
             --seed 12345 \
             --save-result \
             --result-filename benchmark_result.json \
