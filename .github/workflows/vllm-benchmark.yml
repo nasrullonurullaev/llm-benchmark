@@ -23,6 +23,18 @@ on:
         description: "Number of prompts"
         required: false
         default: "20"
+      input_len:
+        description: "Input length (tokens)"
+        required: false
+        default: "1024"
+      output_len:
+        description: "Output length (tokens)"
+        required: false
+        default: "256"
+      extra_args:
+        description: "Additional vLLM CLI arguments (optional)"
+        required: false
+        default: ""        
 
 jobs:
   benchmark:
@@ -90,6 +102,9 @@ jobs:
             --model ${{ inputs.model }} \
             --num-prompts ${{ inputs.num_prompts }} \
             --seed 12345 \
+            --input-len ${{ inputs.input_len }} \
+            --output-len ${{ inputs.output_len }} \
+            ${{ inputs.extra_args }} \
             --save-result \
             --result-filename benchmark_result.json \
             | tee benchmark_output.log
