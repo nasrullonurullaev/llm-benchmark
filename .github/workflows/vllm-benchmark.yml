@@ -41,7 +41,8 @@ jobs:
     name: Run vLLM Benchmark
     runs-on: ubuntu-latest
     env:
-      IMAGE_NAME: "vllm/vllm-openai:v0.8.2"
+      IMAGE_NAME: "vllm/vllm-openai:latest"
+      CUDA_VERSION: "12.4"
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
