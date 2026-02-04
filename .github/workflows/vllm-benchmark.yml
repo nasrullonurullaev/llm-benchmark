@@ -63,7 +63,7 @@ jobs:
             --ports "8000/tcp" \
             --secureCloud \
             --gpuType "${{ inputs.gpu_type }}" \
-            --gpuCount 2
+            --gpuCount 2 \
             --imageName "$IMAGE_NAME" \
             --args "--model ${{ inputs.model }} --max-model-len ${{ inputs.max_model_len }} --port 8000 --gpu-memory-utilization 0.95")
           POD_ID=$(echo "$CREATE_OUTPUT" | awk -F'"' '/pod "/ {print $2}')
