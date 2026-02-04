@@ -126,7 +126,6 @@ jobs:
             echo ""
             echo "### Run config"
             echo "- **GPU (input):** ${{ inputs.gpu_type }}"
-            echo "- **GPU (nvidia-smi):** ${GPU_NAME}"
             echo "- **Model:** ${{ inputs.model }}"
             echo "- **Server max_model_len:** ${{ inputs.max_model_len }}"
             echo "- **Bench input_len:** ${{ inputs.input_len }}"
