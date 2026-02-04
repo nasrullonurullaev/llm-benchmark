@@ -60,7 +60,7 @@ jobs:
             --secureCloud \
             --gpuType "${{ inputs.gpu_type }}" \
             --imageName "$IMAGE_NAME" \
-            --args "--model ${{ inputs.model }} --max-model-len 4096 --port 8000 --enforce-eager --gpu-memory-utilization 0.95")
+            --args "--model ${{ inputs.model }} --max-model-len 131072 --port 8000 --enforce-eager --gpu-memory-utilization 0.95")
           POD_ID=$(echo "$CREATE_OUTPUT" | awk -F'"' '/pod "/ {print $2}')
           echo "POD_ID=$POD_ID" >> $GITHUB_ENV
 
