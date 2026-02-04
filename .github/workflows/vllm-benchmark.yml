@@ -7,6 +7,10 @@ on:
         description: "GPU Type"
         required: false
         default: "NVIDIA RTX 2000 Ada Generation"
+      gpu_number:
+        description: "GPU Number"
+        required: false
+        default: "1"        
       model:
         description: "Model to benchmark"
         required: true
@@ -63,9 +67,9 @@ jobs:
             --ports "8000/tcp" \
             --secureCloud \
             --gpuType "${{ inputs.gpu_type }}" \
-            --gpuCount 2 \
+            --gpuCount ${{ inputs.gpu_number }} \
             --imageName "$IMAGE_NAME" \
-            --args "--model ${{ inputs.model }} --tensor-parallel-size 2 --max-model-len ${{ inputs.max_model_len }} --port 8000 --gpu-memory-utilization 0.95")
+            --args "--model ${{ inputs.model }} --tensor-parallel-size ${{ inputs.gpu_number }} --max-model-len ${{ inputs.max_model_len }} --port 8000 --gpu-memory-utilization 0.95")
           POD_ID=$(echo "$CREATE_OUTPUT" | awk -F'"' '/pod "/ {print $2}')
           echo "POD_ID=$POD_ID" >> $GITHUB_ENV
 
