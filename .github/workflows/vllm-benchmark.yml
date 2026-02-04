@@ -115,10 +115,23 @@ jobs:
 
       - name: Generate Benchmark Summary
         run: |
-          echo "## vLLM Benchmark Result" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          grep -A 20 "============ Serving Benchmark Result" benchmark_output.log >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          GPU_NAME=$(nvidia-smi --query-gpu=name --format=csv,noheader | head -n 1 2>/dev/null || echo "n/a")
+          {
+            echo "## vLLM Benchmark Result"
+            echo ""
+            echo "### Run config"
+            echo "- **GPU (input):** ${{ inputs.gpu_type }}"
+            echo "- **GPU (nvidia-smi):** ${GPU_NAME}"
+            echo "- **Model:** ${{ inputs.model }}"
+            echo "- **Server max_model_len:** ${{ inputs.max_model_len }}"
+            echo "- **Bench input_len:** ${{ inputs.input_len }}"
+            echo "- **Bench output_len:** ${{ inputs.output_len }}"
+            echo ""
+            echo "### Metrics"
+            echo '```'
+            grep -A 200 "============ Serving Benchmark Result" benchmark_output.log || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload Benchmark Results
         uses: actions/upload-artifact@v4
