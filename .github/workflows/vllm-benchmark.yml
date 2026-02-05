@@ -78,6 +78,8 @@ jobs:
             --gpuCount ${{ inputs.gpu_number }} \
             --containerDiskSize ${{ inputs.container_disk_size }} \
             --volumeSize ${{ inputs.volume_size }} \
+            --env "TORCHDYNAMO_DISABLE=1" \
+            --env "VLLM_USE_TORCH_COMPILE=0" \
             --imageName "$IMAGE_NAME" \
             --args "--model ${{ inputs.model }} --tensor-parallel-size ${{ inputs.gpu_number }} --max-model-len ${{ inputs.max_model_len }} --enforce-eager --port 8000 --gpu-memory-utilization 0.95")
       
