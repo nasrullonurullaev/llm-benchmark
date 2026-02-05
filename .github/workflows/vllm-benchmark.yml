@@ -156,6 +156,6 @@ jobs:
           name: benchmark-results
           path: benchmark_result.json
 
-      #- name: Remove RunPod Pod
-      # if: always()
-      #  run: runpodctl remove pod $POD_ID
+      - name: Remove RunPod Pod
+        if: always()
+        run: runpodctl remove pod $POD_ID
