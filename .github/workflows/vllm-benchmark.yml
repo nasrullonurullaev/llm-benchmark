@@ -80,9 +80,13 @@ jobs:
             --volumeSize ${{ inputs.volume_size }} \
             --env "TORCHDYNAMO_DISABLE=1" \
             --env "VLLM_USE_TORCH_COMPILE=0" \
+            --env "NCCL_IB_DISABLE=1" \
+            --env "NCCL_P2P_DISABLE=1" \
+            --env "NCCL_DEBUG=INFO" \
+            --env "NCCL_ASYNC_ERROR_HANDLING=1" \
             --imageName "$IMAGE_NAME" \
-            --args "--model ${{ inputs.model }} --tensor-parallel-size ${{ inputs.gpu_number }} --max-model-len ${{ inputs.max_model_len }} --enforce-eager --port 8000 --gpu-memory-utilization 0.95")
-      
+            --args "--model ${{ inputs.model }} --tensor-parallel-size ${{ inputs.gpu_number }} --max-model-len ${{ inputs.max_model_len }} --enforce-eager --host 0.0.0.0 --port 8000 --gpu-memory-utilization 0.90 --trust-remote-code")
+
           POD_ID=$(echo "$CREATE_OUTPUT" | awk -F'"' '/pod "/ {print $2}')
           echo "POD_ID=$POD_ID" >> $GITHUB_ENV
 
